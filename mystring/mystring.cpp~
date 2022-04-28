@@ -1,0 +1,77 @@
+#include <iostream>
+#include <cstring>
+class MyString {
+  char * str ;
+  int str_len;
+public:
+  MyString(char c);
+  MyString(const char* str);
+  MyString(const MyString& str);
+  ~MyString();
+  int length() const;
+  void print() const;
+  void println() const;
+  MyString& assign(const char* s);
+  MyString& assign(const MyString& str);
+};
+MyString::MyString(char c) {
+  str = new char[1];
+  str[0]=c;
+  str_len = 1;
+}
+MyString::MyString(const char *s) {
+  str_len  = strlen(s);
+  str = new char[str_len];
+  for (int i = 0; i != str_len; i++) {
+    str[i] = s[i];
+  }
+}
+MyString::MyString(const MyString& o){
+  std::cout << "복사 생성자 호출" << std::endl;
+  str_len = o.str_len;
+  str = new char[str_len];
+  for (int i = 0; i != str_len; i++) {
+    str[i] = o.str[i];
+  }
+}
+MyString::~MyString() {
+  delete[] str;
+}
+int MyString::length() const {
+  return str_len;
+}
+void MyString::print() const {
+  for(int i = 0; i != str_len; i++)
+    std::cout << str[i];
+}
+void MyString::println() const {
+  for(int i = 0; i != str_len; i++)
+    {
+      std::cout << str[i] ;
+    }
+  std::cout << ", length = " << this->length() << std::endl;
+}
+MyString& MyString::assign(const char *s) {
+  str_len = strlen(s);
+  str = new char[str_len];
+  for(int i = 0; i != str_len; i++) str[i] = s[i];
+  return *this;
+}
+MyString& MyString::assign(const MyString& o) {
+  str_len = o.str_len;
+  str = new char[str_len];
+  for (int i = 0; i != str_len; i++) str[i]=o.str[i];
+  return *this;
+};
+int main() {
+  MyString str1("hello world!");
+  MyString str2(str1);
+  str1.println();
+  str2.println();
+  str2.assign("very very very very long string");
+  str2.println();
+  str2.assign("short string");
+  str2.println();
+  str2.assign("very long string");
+  str2.println();
+}

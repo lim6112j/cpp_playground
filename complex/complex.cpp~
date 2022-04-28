@@ -1,0 +1,6 @@
+class Complex {
+private:
+  double real, img;
+public:
+  Complex(double real, double img) : real(real), img(img) {}
+};
