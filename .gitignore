@@ -1,3 +1,7 @@
-/smartpointer/example.dSYM/
+*
+!*/
+/**/CmakeFiles
+!*.cpp
+!CMakeLists.txt
 /**/.cache
 /**/build
