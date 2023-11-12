@@ -1,1 +1,5 @@
-/smartpointer/example.dSYM/
+*
+!*/
+/**/CMakeFiles
+!*.cpp
+!CMakeLists.txt

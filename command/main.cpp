@@ -60,17 +60,51 @@ struct BankAccoutCommand : Command {
     }
   }
 };
+struct CompositeBankAccontCommand : vector<BankAccoutCommand>, Command {
+  CompositeBankAccontCommand(const initializer_list<BankAccoutCommand> &items)
+      : vector(items) {}
+  void call() override {
+    for (auto &cmd : *this) {
+      cmd.call();
+    }
+  }
+  void undo() override {
+    for (auto it = rbegin(); it != rend(); it++)
+      it->undo();
+  }
+};
+struct DependentCompositeAccountCommand : CompositeBankAccontCommand {
+  DependentCompositeAccountCommand(
+      const initializer_list<BankAccoutCommand> &items)
+      : CompositeBankAccontCommand(items) {}
+  void call() override {
+    for (auto &cmd : *this) {
+      cmd.call();
+      if (!cmd.succeeded)
+        break;
+    }
+  }
+};
+struct MoneyTransferCommand : CompositeBankAccontCommand {
+  MoneyTransferCommand(BankAccount &from, BankAccount &to, int amount)
+      : CompositeBankAccontCommand{
+            BankAccoutCommand(from, BankAccoutCommand::withdraw, amount),
+            BankAccoutCommand(to, BankAccoutCommand::deposit, amount)} {}
+};
+struct MoneyTransferCommand2 : DependentCompositeAccountCommand {
+  MoneyTransferCommand2(BankAccount &from, BankAccount &to, int amount)
+      : DependentCompositeAccountCommand{
+            BankAccoutCommand(from, BankAccoutCommand::withdraw, amount),
+            BankAccoutCommand(to, BankAccoutCommand::deposit, amount)} {}
+};
 int main(int argc, char *argv[]) {
-  BankAccount bankAccout;
-  vector<BankAccoutCommand> commands{
-      BankAccoutCommand(bankAccout, BankAccoutCommand::withdraw, 200),
-      BankAccoutCommand(bankAccout, BankAccoutCommand::deposit, 100)};
-  cout << bankAccout << endl;
-  for (auto &cmd : commands)
-    cmd.call();
-  cout << bankAccout << "commands size : " << commands.size() << endl;
-  for (auto it = commands.rbegin(); it != commands.rend(); it++)
-    it->undo();
-  cout << bankAccout << "commands size : " << commands.size() << endl;
+  BankAccount ba1;
+  BankAccount ba2;
+  ba1.deposit(1000);
+  MoneyTransferCommand2 mtc{ba1, ba2, 100};
+  mtc.call();
+  cout << "ba1 : " << ba1 << "ba2 : " << ba2 << endl;
+  mtc.undo();
+  cout << "ba1 : " << ba1 << "ba2 : " << ba2 << endl;
   return 0;
 }
